@@ -98,7 +98,7 @@ export function createApp({ store, now = () => new Date() }) {
       const forget = 'navn=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax';
       if (typed.trim() === '') return goTo('/', { 'Set-Cookie': forget });
       const newName = readName(typed);
-      if (!newName) return showCalendar(400, { message: 'Navnet kan være på 60 tegn.', typedName: typed });
+      if (!newName) return showCalendar(400, { message: 'Navnet kan være på høyst 60 tegn.', typedName: typed });
       const remember = `navn=${encodeURIComponent(newName)}; Path=/; Max-Age=31536000; HttpOnly; SameSite=Lax`;
       return goTo('/', { 'Set-Cookie': remember });
     }

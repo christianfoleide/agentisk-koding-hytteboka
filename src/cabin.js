@@ -130,6 +130,9 @@ export function drawWinner(state, { week, today, now, pick = randomInt }) {
   if (entries.length === 0) return refuse(`Ingen har meldt seg på trekningen om ${uke(week)} ennå.`);
 
   const winner = pick(entries.length);
+  if (!Number.isInteger(winner) || !entries[winner]) {
+    throw new RangeError(`pick(${entries.length}) gave ${winner}, not a ticket between 0 and ${entries.length - 1}`);
+  }
   state.bookings[week] = { name: entries[winner].name, at: now };
   return done({ winner, entries: entries.map((entry) => entry.name) });
 }
@@ -139,7 +142,7 @@ export function markDraw(state, { week, label, today }) {
   if (problem) return problem;
 
   const title = tidy(label);
-  if (title.length > LABEL_LENGTH) return refuse(`Navnet på uka kan være på ${LABEL_LENGTH} tegn.`, 400);
+  if (title.length > LABEL_LENGTH) return refuse(`Navnet på uka kan være på høyst ${LABEL_LENGTH} tegn.`, 400);
   if (state.draws[week]) return refuse(`Det trekkes allerede lodd om ${uke(week)}.`);
   const booking = state.bookings[week];
   if (booking) return refuse(`${Uke(week)} er allerede booket av ${booking.name}, så den kan det ikke trekkes lodd om.`);
@@ -181,7 +184,9 @@ function weekProblem(week, today) {
 }
 
 function nameProblem(name) {
-  return readName(name) ? null : refuse('Skriv navnet ditt først.', 400);
+  if (readName(name)) return null;
+  if (tidy(name)) return refuse(`Navnet kan være på høyst ${NAME_LENGTH} tegn.`, 400);
+  return refuse('Skriv navnet ditt først.', 400);
 }
 
 /** Why nobody can enter, leave or draw: there is no draw for the week, or it is done. */
