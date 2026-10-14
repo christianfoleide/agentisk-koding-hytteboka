@@ -69,7 +69,7 @@ describe('booking a week', () => {
     const state = emptyState();
     refused(state, book, as('', AUTUMN), /Skriv navnet ditt/, 400);
     refused(state, book, as('   ', AUTUMN), /Skriv navnet ditt/, 400);
-    refused(state, book, as('x'.repeat(61), AUTUMN), /Skriv navnet ditt/, 400);
+    refused(state, book, as('x'.repeat(61), AUTUMN), /høyst 60 tegn/, 400);
   });
 
   test('a name is the same however it is typed', () => {
@@ -183,6 +183,14 @@ describe('drawing the winner', () => {
     refused(bookWithEaster(), drawWinner, { week: EASTER, today: TODAY, now: NOW }, /Ingen har meldt seg på/);
   });
 
+  test('a pick outside the tickets is an error, and nobody gets the week', () => {
+    for (const bad of [-1, 3, 1.5, undefined]) {
+      const state = bookWithEaster(...people);
+      assert.throws(() => draw(state, () => bad), RangeError);
+      assert.equal(state.bookings[EASTER], undefined);
+    }
+  });
+
   test('a winner is drawn once', () => {
     const state = bookWithEaster(...people);
     draw(state, () => 0);
@@ -238,7 +246,7 @@ describe('choosing the weeks a winner is drawn for', () => {
     const state = emptyState();
     refused(state, markDraw, choose('2026-W41'), /er over/);
     refused(state, markDraw, choose('ingen uke'), /finnes ikke/, 404);
-    refused(state, markDraw, choose(AUTUMN, 'x'.repeat(41)), /40 tegn/, 400);
+    refused(state, markDraw, choose(AUTUMN, 'x'.repeat(41)), /høyst 40 tegn/, 400);
   });
 
   test('a draw nobody has entered can be made an ordinary week again', () => {

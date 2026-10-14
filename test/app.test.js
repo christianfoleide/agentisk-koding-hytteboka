@@ -112,7 +112,7 @@ describe('the calendar', () => {
     assert.equal(response.status, 400);
     assert.equal(response.headers.get('set-cookie'), null);
     const page = await response.text();
-    assert.match(page, /Navnet kan være på 60 tegn/);
+    assert.match(page, /Navnet kan være på høyst 60 tegn/);
     assert.match(page, new RegExp(`value="${'x'.repeat(61)}"`));
   });
 });
